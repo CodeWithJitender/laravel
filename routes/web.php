@@ -9,6 +9,24 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+Route::get('/run-migrations', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return 'Migrations run successfully! Output: <pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return 'Error running migrations: ' . $e->getMessage();
+    }
+});
+
+Route::get('/run-seed', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return 'Database seeding run successfully! Output: <pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return 'Error running seed: ' . $e->getMessage();
+    }
+});
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
