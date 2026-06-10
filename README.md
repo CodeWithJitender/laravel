@@ -21,6 +21,15 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Production Database Deployment Helpers
+
+This application includes custom API-based helper endpoints to run database migrations and seeds on remote hosting environments (e.g. Hostinger, shared hosting) where SSH access is restricted:
+
+- **Run Migrations:** `/api/run-migrations` — triggers `php artisan migrate --force`
+- **Run Seeds:** `/api/run-seed` — triggers `php artisan db:seed --force`
+
+These routes bypass the standard web session check to avoid querying the non-existent `sessions` table prior to migration execution.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
