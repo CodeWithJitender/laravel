@@ -179,4 +179,24 @@
     @endif
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form[action="{{ route('attendance.reports.generate') }}"]');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            const startVal = document.getElementById('start_date').value;
+            const endVal = document.getElementById('end_date').value;
+            if (startVal && endVal) {
+                const start = new Date(startVal);
+                const end = new Date(endVal);
+                if (end < start) {
+                    e.preventDefault();
+                    alert('End Date must be greater than or equal to Start Date.');
+                }
+            }
+        });
+    }
+});
+</script>
 @endsection

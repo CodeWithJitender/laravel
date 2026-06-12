@@ -114,4 +114,63 @@ class ShiftController extends Controller
             return redirect()->route('shifts.index')->with('error', $e->getMessage());
         }
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        if (Gate::denies('shift.delete')) {
+            abort(403);
+        }
+
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No shift selected.'], 400);
+        }
+
+        $deletedCount = 0;
+        $skippedCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $this->shiftService->deleteShift($id);
+                $deletedCount++;
+            } catch (\Exception $e) {
+                $skippedCount++;
+                $errors[] = $e->getMessage();
+            }
+        }
+
+        if ($deletedCount === 0) {
+            return response()->json(['success' => false, 'message' => implode("\n", array_unique($errors))], 400);
+        }
+
+        $message = "Successfully deleted {$deletedCount} shift(s).";
+        if ($skippedCount > 0) {
+            $message .= " {$skippedCount} shift(s) were skipped because they have active employees assigned.";
+        }
+
+        return response()->json(['success' => true, 'message' => $message]);
+    }
+
+    public function bulkUpdate(Request $request)
+    {
+        if (Gate::denies('shift.edit')) {
+            abort(403);
+        }
+
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No shift selected.'], 400);
+        }
+
+        try {
+            $status = $request->input('status');
+            if ($status) {
+                \App\Models\Shift::whereIn('id', $ids)->update(['status' => $status]);
+            }
+            return response()->json(['success' => true, 'message' => 'Selected shifts updated successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
 }

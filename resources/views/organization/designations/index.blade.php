@@ -66,6 +66,7 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="border-b border-white/5 bg-slate-900/30 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <th class="px-6 py-4 w-10"><input type="checkbox" id="select-all" class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-slate-900 cursor-pointer"></th>
                     <th class="px-6 py-4">Designation Code</th>
                     <th class="px-6 py-4">Designation Name</th>
                     <th class="px-6 py-4">Hierarchy Level</th>
@@ -77,6 +78,9 @@
             <tbody class="divide-y divide-white/5 text-sm text-slate-200">
                 @forelse($designations as $desg)
                     <tr class="hover:bg-white/2 transition duration-150">
+                        <td class="px-6 py-4 w-10">
+                            <input type="checkbox" class="row-checkbox w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-slate-900 cursor-pointer" value="{{ $desg->id }}">
+                        </td>
                         <td class="px-6 py-4 font-mono text-xs text-indigo-400 font-bold">
                             {{ $desg->designation_code }}
                         </td>
@@ -126,7 +130,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-slate-500">
+                        <td colspan="7" class="px-6 py-10 text-center text-slate-500">
                             No designations found.
                         </td>
                     </tr>
@@ -141,4 +145,167 @@
     </div>
 
 </div>
+
+<!-- Bulk Floating Action Bar -->
+<div id="bulk-action-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-slate-900/90 border border-indigo-500/25 rounded-2xl py-3 px-6 shadow-2xl backdrop-blur-md flex items-center gap-6 transition-all duration-300 translate-y-24 opacity-0">
+    <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+        <span class="text-xs font-semibold text-slate-200" id="selected-count">0 selected</span>
+    </div>
+    <div class="h-4 w-px bg-white/10"></div>
+    <div class="flex items-center gap-2">
+        <button onclick="openBulkEditModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition cursor-pointer">
+            Bulk Edit
+        </button>
+        <button onclick="confirmBulkDelete()" class="px-3 py-1.5 bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 hover:text-rose-300 rounded-xl text-xs font-semibold border border-rose-500/20 transition cursor-pointer">
+            Bulk Delete
+        </button>
+    </div>
+</div>
+
+<!-- Bulk Edit Modal -->
+<div id="bulkEditModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeBulkEditModal()"></div>
+    <div class="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-sm w-full mx-4 relative z-10 shadow-2xl space-y-6">
+        <div class="flex items-center justify-between border-b border-white/5 pb-4">
+            <h3 class="text-lg font-bold text-white">Bulk Update Status</h3>
+            <button onclick="closeBulkEditModal()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <form id="bulk-edit-form" class="space-y-4">
+            <div>
+                <label for="bulk_status" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Status</label>
+                <select name="status" id="bulk_status" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <option value="">Keep unchanged</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 border-t border-white/5 pt-4">
+                <button type="button" onclick="closeBulkEditModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition cursor-pointer">
+                    Apply Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const selectAllCheckbox = document.getElementById('select-all');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const bulkActionBar = document.getElementById('bulk-action-bar');
+        const selectedCountSpan = document.getElementById('selected-count');
+
+        function updateBulkActionBar() {
+            const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+            if (checkedCount > 0) {
+                selectedCountSpan.innerText = `${checkedCount} selected`;
+                bulkActionBar.classList.remove('translate-y-24', 'opacity-0');
+                bulkActionBar.classList.add('translate-y-0', 'opacity-100');
+            } else {
+                bulkActionBar.classList.remove('translate-y-0', 'opacity-100');
+                bulkActionBar.classList.add('translate-y-24', 'opacity-0');
+            }
+        }
+
+        selectAllCheckbox.addEventListener('change', () => {
+            rowCheckboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+            });
+            updateBulkActionBar();
+        });
+
+        rowCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+                selectAllCheckbox.checked = checkedCount === rowCheckboxes.length;
+                updateBulkActionBar();
+            });
+        });
+
+        // Bulk Delete Action
+        window.confirmBulkDelete = async () => {
+            const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+            if (selectedIds.length === 0) return;
+
+            if (confirm(`Are you sure you want to delete the ${selectedIds.length} selected designation(s)?`)) {
+                try {
+                    const response = await fetch('{{ route("designations.bulk_destroy") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ ids: selectedIds })
+                    });
+                    const res = await response.json();
+                    if (response.ok) {
+                        alert(res.message);
+                        window.location.reload();
+                    } else {
+                        alert(res.message || 'Error occurred while bulk deleting.');
+                    }
+                } catch (err) {
+                    alert('Network error. Failed to bulk delete.');
+                }
+            }
+        };
+
+        // Modal triggers
+        window.openBulkEditModal = () => {
+            document.getElementById('bulkEditModal').classList.remove('hidden');
+        };
+
+        window.closeBulkEditModal = () => {
+            document.getElementById('bulkEditModal').classList.add('hidden');
+        };
+
+        // Form submit
+        const bulkEditForm = document.getElementById('bulk-edit-form');
+        bulkEditForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
+            if (selectedIds.length === 0) return;
+
+            const formData = new FormData(bulkEditForm);
+            const data = { ids: selectedIds };
+            formData.forEach((value, key) => {
+                if (value) {
+                    data[key] = value;
+                }
+            });
+
+            try {
+                const response = await fetch('{{ route("designations.bulk_update") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const res = await response.json();
+                if (response.ok) {
+                    alert(res.message);
+                    window.location.reload();
+                } else {
+                    alert(res.message || 'Error occurred while bulk updating.');
+                }
+            } catch (err) {
+                alert('Network error. Failed to bulk update.');
+            }
+        });
+    });
+</script>
 @endsection

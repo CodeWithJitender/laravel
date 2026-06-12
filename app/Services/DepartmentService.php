@@ -16,8 +16,11 @@ class DepartmentService extends BaseService
         $this->departmentRepo = $departmentRepo;
     }
 
-    public function getPaginated(int $perPage = 15, string $search = '', string $status = '')
+    public function getPaginated(int $perPage = 15, ?string $search = '', ?string $status = '')
     {
+        $search = $search ?? '';
+        $status = $status ?? '';
+
         $query = \App\Models\Department::with('head.user');
 
         if ($search) {
@@ -90,7 +93,10 @@ class DepartmentService extends BaseService
     {
         return $this->transaction(function () use ($id) {
             $hasEmployees = DB::table('employee_details')
-                ->where('department_id', $id)
+                ->join('users', 'employee_details.user_id', '=', 'users.id')
+                ->where('employee_details.department_id', $id)
+                ->whereNull('users.deleted_at')
+                ->whereNull('employee_details.deleted_at')
                 ->exists();
 
             if ($hasEmployees) {

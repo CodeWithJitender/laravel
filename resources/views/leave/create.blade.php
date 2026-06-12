@@ -88,8 +88,9 @@
                 <!-- Emergency Contact Phone -->
                 <div>
                     <label for="emergency_phone" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Emergency Contact Number</label>
-                    <input type="text" name="emergency_phone" id="emergency_phone" required placeholder="e.g. +91 98765 43210"
+                    <input type="tel" name="emergency_phone" id="emergency_phone" required placeholder="e.g. +91 98765 43210"
                            value="{{ old('emergency_phone') }}"
+                           oninput="this.value = this.value.replace(/[^0-9+\-\s()]/g, '');"
                            class="w-full bg-slate-900/60 border border-white/10 rounded-2xl py-2.5 px-4 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 text-sm @error('emergency_phone') border-rose-500 @enderror">
                     @error('emergency_phone')
                         <span class="text-rose-400 text-xs mt-1 block">{{ $message }}</span>
@@ -285,6 +286,22 @@
     document.addEventListener('DOMContentLoaded', () => {
         toggleHalfDay();
         updateBalanceInfo();
+        
+        const form = document.getElementById('leave-form');
+        form.addEventListener('submit', (e) => {
+            const startDateVal = document.getElementById('start_date').value;
+            const endDateVal = document.getElementById('end_date').disabled 
+                ? document.getElementById('start_date').value 
+                : document.getElementById('end_date').value;
+            if (startDateVal && endDateVal) {
+                const start = new Date(startDateVal);
+                const end = new Date(endDateVal);
+                if (end < start) {
+                    e.preventDefault();
+                    alert('End Date must be greater than or equal to Start Date.');
+                }
+            }
+        });
     });
 </script>
 @endsection

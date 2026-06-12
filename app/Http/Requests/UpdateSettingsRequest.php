@@ -20,7 +20,7 @@ class UpdateSettingsRequest extends FormRequest
                 return [
                     'company_name' => 'required|string|max:150',
                     'company_code' => 'required|string|max:50',
-                    'company_logo' => 'nullable|string|max:255',
+                    'company_logo' => 'nullable',
                     'address' => 'nullable|string|max:255',
                     'city' => 'nullable|string|max:100',
                     'state' => 'nullable|string|max:100',
@@ -42,6 +42,12 @@ class UpdateSettingsRequest extends FormRequest
                     'time_format' => 'required|string|max:20',
                     'language' => 'required|string|max:10',
                     'system_status' => 'required|in:online,maintenance',
+                    'theme_mode' => 'required|string|in:light,dark',
+                    'primary_color' => 'required|string|max:10',
+                    'secondary_color' => 'required|string|max:10',
+                    'accent_color' => 'required|string|max:10',
+                    'bg_light' => 'required|string|max:10',
+                    'bg_dark' => 'required|string|max:10',
                 ];
             case 'email':
                 return [

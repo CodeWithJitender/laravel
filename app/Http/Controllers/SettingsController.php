@@ -57,6 +57,13 @@ class SettingsController extends Controller
     {
         $validated = $request->validated();
 
+        if ($group === 'company' && $request->hasFile('company_logo')) {
+            $file = $request->file('company_logo');
+            $filename = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images'), $filename);
+            $validated['company_logo'] = '/images/' . $filename;
+        }
+
         try {
             $success = Settings::update($group, $validated);
 

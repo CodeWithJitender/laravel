@@ -15,5 +15,11 @@ class SystemSetting extends Model
         'time_format',
         'language',
         'system_status',
+        'theme_mode',
+        'primary_color',
+        'secondary_color',
+        'accent_color',
+        'bg_light',
+        'bg_dark',
     ];
 }

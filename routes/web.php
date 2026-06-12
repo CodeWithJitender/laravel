@@ -30,6 +30,22 @@ Route::middleware(['auth', 'status.check', 'maintenance.check', 'session.timeout
         Route::post('/permissions/sync', [\App\Http\Controllers\PermissionController::class, 'syncMatrix']);
     });
 
+    // Employee Import Routes
+    Route::get('/employees/import/template', [\App\Http\Controllers\EmployeeController::class, 'downloadTemplate'])->name('employees.import.template');
+    Route::post('/employees/import', [\App\Http\Controllers\EmployeeController::class, 'import'])->name('employees.import');
+
+    // Bulk Operations Routes
+    Route::post('/employees/bulk-delete', [\App\Http\Controllers\EmployeeController::class, 'bulkDestroy'])->name('employees.bulk_destroy');
+    Route::post('/employees/bulk-edit', [\App\Http\Controllers\EmployeeController::class, 'bulkUpdate'])->name('employees.bulk_update');
+    Route::post('/designations/bulk-delete', [\App\Http\Controllers\DesignationController::class, 'bulkDestroy'])->name('designations.bulk_destroy');
+    Route::post('/designations/bulk-edit', [\App\Http\Controllers\DesignationController::class, 'bulkUpdate'])->name('designations.bulk_update');
+    Route::post('/departments/bulk-delete', [\App\Http\Controllers\DepartmentController::class, 'bulkDestroy'])->name('departments.bulk_destroy');
+    Route::post('/departments/bulk-edit', [\App\Http\Controllers\DepartmentController::class, 'bulkUpdate'])->name('departments.bulk_update');
+    Route::post('/locations/bulk-delete', [\App\Http\Controllers\LocationController::class, 'bulkDestroy'])->name('locations.bulk_destroy');
+    Route::post('/locations/bulk-edit', [\App\Http\Controllers\LocationController::class, 'bulkUpdate'])->name('locations.bulk_update');
+    Route::post('/shifts/bulk-delete', [\App\Http\Controllers\ShiftController::class, 'bulkDestroy'])->name('shifts.bulk_destroy');
+    Route::post('/shifts/bulk-edit', [\App\Http\Controllers\ShiftController::class, 'bulkUpdate'])->name('shifts.bulk_update');
+
     // Employee Management
     Route::resource('/employees', \App\Http\Controllers\EmployeeController::class);
 

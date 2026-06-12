@@ -118,4 +118,63 @@ class DepartmentController extends Controller
             return redirect()->route('departments.index')->with('error', $e->getMessage());
         }
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        if (Gate::denies('department.delete')) {
+            abort(403);
+        }
+
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No department selected.'], 400);
+        }
+
+        $deletedCount = 0;
+        $skippedCount = 0;
+        $errors = [];
+
+        foreach ($ids as $id) {
+            try {
+                $this->departmentService->deleteDepartment($id);
+                $deletedCount++;
+            } catch (\Exception $e) {
+                $skippedCount++;
+                $errors[] = $e->getMessage();
+            }
+        }
+
+        if ($deletedCount === 0) {
+            return response()->json(['success' => false, 'message' => implode("\n", array_unique($errors))], 400);
+        }
+
+        $message = "Successfully deleted {$deletedCount} department(s).";
+        if ($skippedCount > 0) {
+            $message .= " {$skippedCount} department(s) were skipped because they have active employees assigned.";
+        }
+
+        return response()->json(['success' => true, 'message' => $message]);
+    }
+
+    public function bulkUpdate(Request $request)
+    {
+        if (Gate::denies('department.edit')) {
+            abort(403);
+        }
+
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'No department selected.'], 400);
+        }
+
+        try {
+            $status = $request->input('status');
+            if ($status) {
+                \App\Models\Department::whereIn('id', $ids)->update(['status' => $status]);
+            }
+            return response()->json(['success' => true, 'message' => 'Selected departments updated successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
 }

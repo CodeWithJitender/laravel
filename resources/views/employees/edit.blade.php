@@ -49,8 +49,16 @@
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password (Leave blank to keep current)</label>
-                    <input type="password" name="password" id="password"
-                           class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition @error('password') border-rose-500 @enderror">
+                    <div class="relative">
+                        <input type="password" name="password" id="password"
+                               class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 pr-10 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition @error('password') border-rose-500 @enderror">
+                        <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                    </div>
                     @error('password')
                         <span class="block text-rose-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
@@ -59,8 +67,16 @@
                 <!-- Password Confirmation -->
                 <div>
                     <label for="password_confirmation" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Confirm Password</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation"
-                           class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    <div class="relative">
+                        <input type="password" name="password_confirmation" id="password_confirmation"
+                               class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 pr-10 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                        <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Status -->
@@ -198,7 +214,8 @@
                 <!-- Phone -->
                 <div>
                     <label for="phone" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Phone Number</label>
-                    <input type="text" name="phone" id="phone" value="{{ old('phone', $employee->employeeDetail?->phone) }}" placeholder="+1234567890"
+                    <input type="tel" name="phone" id="phone" value="{{ old('phone', $employee->employeeDetail?->phone) }}" placeholder="+1234567890"
+                           oninput="this.value = this.value.replace(/[^0-9+\-\s()]/g, '');"
                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition @error('phone') border-rose-500 @enderror">
                     @error('phone')
                         <span class="block text-rose-500 text-xs mt-1">{{ $message }}</span>
@@ -269,4 +286,46 @@
         </div>
     </form>
 </div>
+
+<script>
+function togglePasswordVisibility(inputId, button) {
+    const input = document.getElementById(inputId);
+    const svg = button.querySelector('svg');
+    if (input.type === 'password') {
+        input.type = 'text';
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>';
+    } else {
+        input.type = 'password';
+        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const joiningInput = document.getElementById('joining_date');
+    const exitInput = document.getElementById('exit_date');
+    
+    function updateExitMin() {
+        if (joiningInput.value) {
+            exitInput.min = joiningInput.value;
+        } else {
+            exitInput.removeAttribute('min');
+        }
+    }
+    
+    joiningInput.addEventListener('change', updateExitMin);
+    updateExitMin();
+    
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        if (joiningInput.value && exitInput.value) {
+            const joinDate = new Date(joiningInput.value);
+            const exitDate = new Date(exitInput.value);
+            if (exitDate < joinDate) {
+                e.preventDefault();
+                alert('Exit Date (Contract End) must be greater than or equal to Joining Date.');
+            }
+        }
+    });
+});
+</script>
 @endsection

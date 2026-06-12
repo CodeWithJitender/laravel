@@ -1,19 +1,127 @@
+@php
+    $companySettings = \App\Support\Facades\Settings::getGroup('company');
+    $systemSettings = \App\Support\Facades\Settings::getGroup('system');
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') | HRMS Enterprise</title>
+    <title>@yield('title', 'Dashboard') | {{ $companySettings->company_name ?? 'HRMS Enterprise' }}</title>
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
     <style>
+        :root {
+            --primary-color: {{ $systemSettings->primary_color ?? '#0c75a4' }};
+            --secondary-color: {{ $systemSettings->secondary_color ?? '#50535a' }};
+            --accent-color: {{ $systemSettings->accent_color ?? '#0284c7' }};
+            --bg-light: {{ $systemSettings->bg_light ?? '#f8fafc' }};
+            --bg-dark: {{ $systemSettings->bg_dark ?? '#090d16' }};
+        }
+
+        body.light-theme {
+            --body-bg: var(--bg-light);
+            --sidebar-bg: #ffffff;
+            --border-color: #cbd5e1;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+        }
+
+        body.dark-theme {
+            --body-bg: var(--bg-dark);
+            --sidebar-bg: #0b0f19;
+            --border-color: #1e293b;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+            --input-border: #1e293b;
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
+            background-color: var(--body-bg) !important;
+            color: var(--text-main) !important;
         }
+        aside {
+            background-color: var(--sidebar-bg) !important;
+            border-color: var(--border-color) !important;
+        }
+        header {
+            background-color: var(--sidebar-bg) !important;
+            border-color: var(--border-color) !important;
+        }
+        footer {
+            background-color: var(--body-bg) !important;
+            border-color: var(--border-color) !important;
+        }
+        .bg-slate-900 {
+            background-color: var(--sidebar-bg) !important;
+        }
+        .bg-slate-950 {
+            background-color: var(--body-bg) !important;
+        }
+        .bg-white\/5 {
+            background-color: var(--card-bg) !important;
+        }
+        .border-white\/10 {
+            border-color: var(--border-color) !important;
+        }
+        .border-slate-800 {
+            border-color: var(--border-color) !important;
+        }
+        .text-slate-100 {
+            color: var(--text-main) !important;
+        }
+        .text-slate-300 {
+            color: var(--text-muted) !important;
+        }
+        .text-slate-400 {
+            color: var(--text-muted) !important;
+        }
+        .bg-indigo-600 {
+            background-color: var(--primary-color) !important;
+        }
+        .hover\:bg-indigo-500:hover {
+            background-color: var(--accent-color) !important;
+        }
+        .text-indigo-400 {
+            color: var(--primary-color) !important;
+        }
+        .bg-indigo-600\/10 {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, transparent) !important;
+        }
+        .border-indigo-500\/10 {
+            border-color: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
+        }
+
+        input, select, textarea {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text-main) !important;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color) !important;
+        }
+
+        .text-indigo-400 svg {
+            color: var(--primary-color) !important;
+        }
+        .accent-indigo-500 {
+            accent-color: var(--primary-color) !important;
+        }
+
+        .bg-gradient-to-tr.from-indigo-500.to-purple-600 {
+            background-image: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+        }
+
         summary::-webkit-details-marker {
             display: none;
         }
@@ -22,21 +130,27 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+<body class="min-h-screen flex {{ ($systemSettings->theme_mode ?? 'dark') }}-theme">
 
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shrink-0">
         <!-- Sidebar Brand -->
         <div class="h-16 px-6 border-b border-slate-800 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-            </div>
-            <div>
-                <span class="font-bold tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">HRMS Enterprise</span>
-                <span class="block text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Console</span>
-            </div>
+            @if(!empty($companySettings->company_logo))
+                <div class="flex items-center justify-center w-full">
+                    <img src="{{ asset($companySettings->company_logo) }}" alt="Logo" class="h-10 max-w-full object-contain">
+                </div>
+            @else
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25 shrink-0">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <div class="overflow-hidden">
+                    <span class="font-bold tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent block truncate">{{ $companySettings->company_name ?? 'HRMS Enterprise' }}</span>
+                    <span class="block text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">Console</span>
+                </div>
+            @endif
         </div>
 
         <!-- Sidebar Navigation -->
@@ -405,6 +519,18 @@
 
             <!-- Top Bar Actions -->
             <div class="flex items-center gap-4">
+                <!-- Theme Mode Toggle Switch -->
+                <button onclick="toggleThemeMode()" id="theme-toggle-btn" class="p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-white transition duration-200 cursor-pointer" title="Toggle Light/Dark Theme">
+                    <!-- Sun Icon (visible in dark mode, hidden in light mode) -->
+                    <svg id="theme-sun-icon" class="w-5 h-5 {{ ($systemSettings->theme_mode ?? 'dark') === 'light' ? 'hidden' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                    </svg>
+                    <!-- Moon Icon (visible in light mode, hidden in dark mode) -->
+                    <svg id="theme-moon-icon" class="w-5 h-5 {{ ($systemSettings->theme_mode ?? 'dark') === 'dark' ? 'hidden' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+
                 <!-- Notifications Dropdown -->
                 <div class="relative" id="notification-bell-container">
                     <button id="notification-bell-btn" class="p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-white transition duration-200 relative cursor-pointer">
@@ -683,6 +809,68 @@
         // Close on backdrop click
         backdrop.addEventListener('click', closeModal);
     });
+    </script>
+
+    <!-- Theme Toggling and Persisting Scripts -->
+    <script>
+        const systemSettings = {
+            app_name: "{{ $systemSettings->app_name ?? 'HRMS' }}",
+            app_version: "{{ $systemSettings->app_version ?? '1.0.0' }}",
+            default_timezone: "{{ $systemSettings->default_timezone ?? 'UTC' }}",
+            default_currency: "{{ $systemSettings->default_currency ?? 'USD' }}",
+            date_format: "{{ $systemSettings->date_format ?? 'Y-m-d' }}",
+            time_format: "{{ $systemSettings->time_format ?? 'H:i:s' }}",
+            language: "{{ $systemSettings->language ?? 'en' }}",
+            system_status: "{{ $systemSettings->system_status ?? 'online' }}",
+            primary_color: "{{ $systemSettings->primary_color ?? '#0c75a4' }}",
+            secondary_color: "{{ $systemSettings->secondary_color ?? '#50535a' }}",
+            accent_color: "{{ $systemSettings->accent_color ?? '#0284c7' }}",
+            bg_light: "{{ $systemSettings->bg_light ?? '#f8fafc' }}",
+            bg_dark: "{{ $systemSettings->bg_dark ?? '#090d16' }}",
+            theme_mode: "{{ $systemSettings->theme_mode ?? 'dark' }}"
+        };
+
+        async function toggleThemeMode() {
+            const currentMode = systemSettings.theme_mode;
+            const newMode = currentMode === 'light' ? 'dark' : 'light';
+            
+            // Optimistic update: modify body classes instantly
+            document.body.classList.remove('light-theme', 'dark-theme');
+            document.body.classList.add(newMode + '-theme');
+            systemSettings.theme_mode = newMode;
+            
+            updateThemeToggleIcon(newMode);
+
+            // Save preference to database
+            try {
+                await fetch('/settings/system', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ...systemSettings,
+                        theme_mode: newMode
+                    })
+                });
+            } catch (err) {
+                console.error('Failed to persist theme preference via AJAX', err);
+            }
+        }
+
+        function updateThemeToggleIcon(mode) {
+            const sunIcon = document.getElementById('theme-sun-icon');
+            const moonIcon = document.getElementById('theme-moon-icon');
+            if (mode === 'light') {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            }
+        }
     </script>
 </body>
 </html>

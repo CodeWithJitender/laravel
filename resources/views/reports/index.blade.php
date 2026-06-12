@@ -464,6 +464,20 @@
     // Run preview
     async function runPreview() {
         if (!currentUuid) return;
+
+        if (currentReportCode === 'EMP_JOIN' || currentReportCode === 'ATT_DAILY') {
+            const startVal = document.getElementById('input-start-date').value;
+            const endVal = document.getElementById('input-end-date').value;
+            if (startVal && endVal) {
+                const start = new Date(startVal);
+                const end = new Date(endVal);
+                if (end < start) {
+                    showToast('error', 'End Date must be greater than or equal to Start Date.');
+                    return;
+                }
+            }
+        }
+
         const filters = gatherFilters();
         
         try {
@@ -574,6 +588,20 @@
     // Queue Report generation
     async function generateExport() {
         if (!currentReportCode) return;
+
+        if (currentReportCode === 'EMP_JOIN' || currentReportCode === 'ATT_DAILY') {
+            const startVal = document.getElementById('input-start-date').value;
+            const endVal = document.getElementById('input-end-date').value;
+            if (startVal && endVal) {
+                const start = new Date(startVal);
+                const end = new Date(endVal);
+                if (end < start) {
+                    showToast('error', 'End Date must be greater than or equal to Start Date.');
+                    return;
+                }
+            }
+        }
+
         const format = document.getElementById('export-format').value;
         const filters = gatherFilters();
 

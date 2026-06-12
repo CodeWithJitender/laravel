@@ -76,7 +76,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Phone</label>
-                            <input type="text" name="phone" value="{{ $company->phone ?? '' }}" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                            <input type="tel" name="phone" value="{{ $company->phone ?? '' }}" oninput="this.value = this.value.replace(/[^0-9+\-\s()]/g, '');" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Website URL</label>
@@ -86,6 +86,23 @@
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tax Registration (VAT/GST/EIN)</label>
                             <input type="text" name="tax_number" value="{{ $company->tax_number ?? '' }}" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
                         </div>
+                        <div class="md:col-span-2 flex items-center gap-6 p-4 bg-slate-900/50 rounded-xl border border-slate-800">
+                            <div class="w-20 h-20 rounded-xl bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-700 shrink-0">
+                                @if(!empty($company->company_logo))
+                                    <img src="{{ asset($company->company_logo) }}" id="logo-preview" class="w-full h-full object-contain">
+                                @else
+                                    <svg id="logo-placeholder" class="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                @endif
+                            </div>
+                            <div class="flex-grow">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Company Logo</label>
+                                <input type="file" name="company_logo" id="company_logo_input" accept="image/*" onchange="previewLogo(this)" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600/10 file:text-indigo-400 hover:file:bg-indigo-600/20 cursor-pointer">
+                                <p class="text-[11px] text-slate-500 mt-2">PNG, JPG, or SVG. Suggested size: 250x60px.</p>
+                            </div>
+                        </div>
+
                         <div class="md:col-span-2">
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Street Address</label>
                             <input type="text" name="address" value="{{ $company->address ?? '' }}" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
@@ -139,6 +156,52 @@
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Default Locale Language</label>
                             <input type="text" name="language" value="{{ $system->language ?? 'en' }}" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
                         </div>
+
+                        <div class="md:col-span-2 mt-4">
+                            <h4 class="text-sm font-bold text-indigo-400 border-b border-white/5 pb-2 mb-4">Aesthetics & Color Theme</h4>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Theme Mode</label>
+                            <select name="theme_mode" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                                <option value="light" {{ ($system->theme_mode ?? 'dark') === 'light' ? 'selected' : '' }}>Light Mode</option>
+                                <option value="dark" {{ ($system->theme_mode ?? 'dark') === 'dark' ? 'selected' : '' }}>Dark Mode</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Primary Color (HEX)</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="primary_color_picker" value="{{ $system->primary_color ?? '#0c75a4' }}" oninput="document.getElementById('primary_color_input').value = this.value" class="w-10 h-10 border-0 bg-transparent cursor-pointer rounded-xl overflow-hidden shrink-0">
+                                <input type="text" name="primary_color" id="primary_color_input" value="{{ $system->primary_color ?? '#0c75a4' }}" oninput="document.getElementById('primary_color_picker').value = this.value" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 uppercase">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Secondary Color (HEX)</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="secondary_color_picker" value="{{ $system->secondary_color ?? '#50535a' }}" oninput="document.getElementById('secondary_color_input').value = this.value" class="w-10 h-10 border-0 bg-transparent cursor-pointer rounded-xl overflow-hidden shrink-0">
+                                <input type="text" name="secondary_color" id="secondary_color_input" value="{{ $system->secondary_color ?? '#50535a' }}" oninput="document.getElementById('secondary_color_picker').value = this.value" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 uppercase">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Accent Color (HEX)</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="accent_color_picker" value="{{ $system->accent_color ?? '#0284c7' }}" oninput="document.getElementById('accent_color_input').value = this.value" class="w-10 h-10 border-0 bg-transparent cursor-pointer rounded-xl overflow-hidden shrink-0">
+                                <input type="text" name="accent_color" id="accent_color_input" value="{{ $system->accent_color ?? '#0284c7' }}" oninput="document.getElementById('accent_color_picker').value = this.value" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 uppercase">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Light Mode Background (HEX)</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="bg_light_picker" value="{{ $system->bg_light ?? '#f8fafc' }}" oninput="document.getElementById('bg_light_input').value = this.value" class="w-10 h-10 border-0 bg-transparent cursor-pointer rounded-xl overflow-hidden shrink-0">
+                                <input type="text" name="bg_light" id="bg_light_input" value="{{ $system->bg_light ?? '#f8fafc' }}" oninput="document.getElementById('bg_light_picker').value = this.value" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 uppercase">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Dark Mode Background (HEX)</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="bg_dark_picker" value="{{ $system->bg_dark ?? '#090d16' }}" oninput="document.getElementById('bg_dark_input').value = this.value" class="w-10 h-10 border-0 bg-transparent cursor-pointer rounded-xl overflow-hidden shrink-0">
+                                <input type="text" name="bg_dark" id="bg_dark_input" value="{{ $system->bg_dark ?? '#090d16' }}" oninput="document.getElementById('bg_dark_picker').value = this.value" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 uppercase">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex justify-end pt-4 border-t border-white/5">
@@ -167,7 +230,15 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">SMTP Password</label>
-                            <input type="password" name="smtp_password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                            <div class="relative">
+                                <input type="password" name="smtp_password" id="smtp_password" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 pr-10 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                                <button type="button" onclick="togglePasswordVisibility('smtp_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sender Name</label>
@@ -392,7 +463,15 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">AWS Secret Key</label>
-                            <input type="password" name="s3_secret" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                            <div class="relative">
+                                <input type="password" name="s3_secret" id="s3_secret" placeholder="••••••••••••" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 pr-10 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                                <button type="button" onclick="togglePasswordVisibility('s3_secret', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">S3 Region</label>
@@ -523,35 +602,62 @@
         }, 3000);
     }
 
-    // Submit group settings via PUT AJAX
+    // Preview logo on selection
+    function previewLogo(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let preview = document.getElementById('logo-preview');
+                const placeholder = document.getElementById('logo-placeholder');
+                
+                if (preview) {
+                    preview.src = e.target.result;
+                } else if (placeholder) {
+                    const img = document.createElement('img');
+                    img.id = 'logo-preview';
+                    img.className = 'w-full h-full object-contain';
+                    img.src = e.target.result;
+                    placeholder.parentNode.appendChild(img);
+                    placeholder.remove();
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Submit group settings via AJAX using FormData to allow file uploads (spoofed as PUT)
     async function saveSettings(event, group) {
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);
-        const json = {};
         
-        formData.forEach((value, key) => {
-            json[key] = value;
-        });
+        // Add Laravel's method spoofing so that it is processed as PUT
+        formData.append('_method', 'PUT');
 
-        // Handle unchecked checkboxes
+        // Handle checkboxes (explicit false value when unchecked)
         form.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            json[cb.name] = cb.checked;
+            if (!formData.has(cb.name)) {
+                formData.append(cb.name, '0');
+            }
         });
 
         try {
             const response = await fetch(`/settings/${group}`, {
-                method: 'PUT',
+                method: 'POST', // Spoofed to PUT
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(json)
+                body: formData
             });
             const res = await response.json();
             if (response.ok) {
                 showToast('success', res.message || 'Settings updated successfully.');
+                
+                // If company or system settings changed, refresh after 1 second to apply theme/logo updates
+                if (group === 'company' || group === 'system') {
+                    setTimeout(() => window.location.reload(), 1000);
+                }
             } else {
                 showToast('error', res.message || 'Verification failed. Review form input fields.');
             }
@@ -586,6 +692,18 @@
         } catch (err) {
             showToast('error', 'Network error updating feature flag.');
             checkbox.checked = !isEnabled;
+        }
+    }
+
+    function togglePasswordVisibility(inputId, button) {
+        const input = document.getElementById(inputId);
+        const svg = button.querySelector('svg');
+        if (input.type === 'password') {
+            input.type = 'text';
+            svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>';
+        } else {
+            input.type = 'password';
+            svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
         }
     }
 </script>

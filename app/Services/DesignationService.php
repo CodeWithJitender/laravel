@@ -16,8 +16,11 @@ class DesignationService extends BaseService
         $this->designationRepo = $designationRepo;
     }
 
-    public function getPaginated(int $perPage = 15, string $search = '', string $status = '')
+    public function getPaginated(int $perPage = 15, ?string $search = '', ?string $status = '')
     {
+        $search = $search ?? '';
+        $status = $status ?? '';
+
         $query = \App\Models\Designation::with('hierarchy.parentDesignation');
 
         if ($search) {
@@ -92,6 +95,7 @@ class DesignationService extends BaseService
             $assignedEmployees = DB::table('employee_details')
                 ->join('users', 'employee_details.user_id', '=', 'users.id')
                 ->where('employee_details.designation_id', $id)
+                ->whereNull('users.deleted_at')
                 ->whereNull('employee_details.deleted_at')
                 ->pluck('users.name')
                 ->toArray();
