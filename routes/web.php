@@ -13,6 +13,11 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetOtp'])->name('password.email');
+Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+
 Route::middleware(['auth', 'status.check', 'maintenance.check', 'session.timeout'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/change-password', [AuthController::class, 'showChangePassword'])->name('password.change');
@@ -79,6 +84,9 @@ Route::middleware(['auth', 'status.check', 'maintenance.check', 'session.timeout
     Route::put('/attendance/corrections/{id}/review', [\App\Http\Controllers\AttendanceCorrectionController::class, 'review'])->name('attendance.corrections.review');
 
     // Daily punch sheet resource
+    Route::get('/attendance/import/template', [\App\Http\Controllers\AttendanceConsoleController::class, 'downloadTemplate'])->name('attendance.import.template');
+    Route::post('/attendance/import', [\App\Http\Controllers\AttendanceConsoleController::class, 'import'])->name('attendance.import');
+
     Route::resource('/attendance', \App\Http\Controllers\AttendanceConsoleController::class)->names([
         'index' => 'attendance.index',
         'create' => 'attendance.create',

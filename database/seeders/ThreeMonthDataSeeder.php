@@ -229,9 +229,9 @@ class ThreeMonthDataSeeder extends Seeder
 
             $this->command->info('Generated approved employee leave requests.');
 
-            // 5. Daily Attendance Loop (March 1, 2026 to June 12, 2026)
+            // 5. Daily Attendance Loop (March 1, 2026 to June 15, 2026)
             $start = Carbon::parse('2026-03-01');
-            $end = Carbon::parse('2026-06-12');
+            $end = Carbon::parse('2026-06-15');
             
             $daysCount = $start->diffInDays($end) + 1;
             $this->command->info("Generating daily attendance records for {$daysCount} calendar days...");

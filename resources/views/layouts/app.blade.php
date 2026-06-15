@@ -128,6 +128,128 @@
         summary {
             list-style: none;
         }
+
+        /* --- Light Theme High-Contrast Overrides --- */
+        body.light-theme {
+            --text-main: #0f172a; /* Slate 900 */
+            --text-muted: #475569; /* Slate 600 */
+        }
+
+        /* 2. Text Overrides: Map white and light gray texts to dark main text */
+        body.light-theme .text-white {
+            color: var(--text-main) !important;
+        }
+        body.light-theme .text-slate-200 {
+            color: var(--text-main) !important;
+        }
+        body.light-theme .text-slate-500 {
+            color: var(--text-muted) !important;
+        }
+
+        /* 3. Restore White text for colored/vibrant components (indigo/rose/emerald badges and buttons) */
+        body.light-theme .bg-indigo-600,
+        body.light-theme .bg-indigo-500,
+        body.light-theme .bg-rose-600,
+        body.light-theme .bg-rose-500,
+        body.light-theme .bg-emerald-600,
+        body.light-theme .bg-emerald-500,
+        body.light-theme .bg-indigo-600 *,
+        body.light-theme .bg-indigo-500 *,
+        body.light-theme .bg-rose-600 *,
+        body.light-theme .bg-rose-500 *,
+        body.light-theme .bg-emerald-600 *,
+        body.light-theme .bg-emerald-500 *,
+        body.light-theme .bg-gradient-to-tr *,
+        body.light-theme .bg-gradient-to-r * {
+            color: #ffffff !important;
+        }
+
+        /* 4. Secondary Buttons and Badges (slate-800 / slate-700) */
+        body.light-theme .bg-slate-800 {
+            background-color: #e2e8f0 !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-theme .bg-slate-800 * {
+            color: var(--text-main) !important;
+        }
+        body.light-theme .bg-slate-800:hover {
+            background-color: #cbd5e1 !important;
+        }
+        body.light-theme .bg-slate-800:hover * {
+            color: #000000 !important;
+        }
+        body.light-theme .bg-slate-700 {
+            background-color: #cbd5e1 !important;
+            border-color: #94a3b8 !important;
+        }
+        body.light-theme .bg-slate-700 * {
+            color: var(--text-main) !important;
+        }
+        body.light-theme .bg-slate-700:hover {
+            background-color: #94a3b8 !important;
+        }
+        body.light-theme .bg-slate-700:hover * {
+            color: #000000 !important;
+        }
+
+        /* 5. Custom status color mappings for high contrast and readability on white background */
+        body.light-theme .text-emerald-400 {
+            color: #059669 !important; /* emerald 600 */
+        }
+        body.light-theme .text-rose-400 {
+            color: #e11d48 !important; /* rose 600 */
+        }
+        body.light-theme .text-amber-400 {
+            color: #d97706 !important; /* amber 600 */
+        }
+        body.light-theme .text-purple-400 {
+            color: #7c3aed !important; /* purple 600 */
+        }
+        body.light-theme .text-indigo-400 {
+            color: var(--primary-color) !important;
+        }
+
+        /* 6. Card/Panel background opacities mapping to premium soft light-gray */
+        body.light-theme .bg-slate-900\/50,
+        body.light-theme .bg-slate-900\/60,
+        body.light-theme .bg-slate-950\/50,
+        body.light-theme .bg-slate-950\/40 {
+            background-color: rgba(15, 23, 42, 0.03) !important;
+        }
+        body.light-theme .bg-slate-900\/95 {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+
+        /* 7. Grid dividers and border lines */
+        body.light-theme .border-white\/5 {
+            border-color: var(--border-color) !important;
+        }
+        body.light-theme .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+        body.light-theme .divide-slate-800\/50 > :not([hidden]) ~ :not([hidden]) {
+            border-color: var(--border-color) !important;
+        }
+
+        /* 8. Table row hover and minor backgrounds */
+        body.light-theme .bg-white\/\[0\.02\] {
+            background-color: rgba(15, 23, 42, 0.02) !important;
+        }
+        body.light-theme .bg-white\/\[0\.01\] {
+            background-color: rgba(15, 23, 42, 0.01) !important;
+        }
+        body.light-theme .hover\:bg-white\/\[0\.02\]:hover {
+            background-color: rgba(15, 23, 42, 0.03) !important;
+        }
+
+        /* 9. Sidebar Brand Name Text Gradient visibility on light background */
+        body.light-theme .bg-gradient-to-r.from-white.to-slate-400 {
+            background-image: none !important;
+            background-clip: unset !important;
+            -webkit-background-clip: unset !important;
+            color: var(--text-main) !important;
+        }
+        body.light-theme .hover\:bg-slate-800\/50:hover {
+            background-color: rgba(15, 23, 42, 0.05) !important;
+        }
     </style>
 </head>
 <body class="min-h-screen flex {{ ($systemSettings->theme_mode ?? 'dark') }}-theme">

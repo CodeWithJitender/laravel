@@ -169,5 +169,26 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Attendance::observe(\App\Observers\AuditModelObserver::class);
         \App\Models\PayrollRun::observe(\App\Observers\AuditModelObserver::class);
         \App\Models\Payslip::observe(\App\Observers\AuditModelObserver::class);
+
+        // Load dynamic mailer configuration from database settings if customized
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('email_settings')) {
+                $emailSettings = \App\Models\EmailSetting::first();
+                if ($emailSettings && !empty($emailSettings->smtp_host) && $emailSettings->smtp_host !== 'smtp.mailtrap.io' && $emailSettings->smtp_username !== 'test-user') {
+                    config([
+                        'mail.default' => 'smtp',
+                        'mail.mailers.smtp.host' => $emailSettings->smtp_host,
+                        'mail.mailers.smtp.port' => $emailSettings->smtp_port,
+                        'mail.mailers.smtp.username' => $emailSettings->smtp_username,
+                        'mail.mailers.smtp.password' => $emailSettings->smtp_password,
+                        'mail.mailers.smtp.encryption' => $emailSettings->encryption,
+                        'mail.from.address' => $emailSettings->sender_email,
+                        'mail.from.name' => $emailSettings->sender_name,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // Silence database bootstrap failures (e.g. before migrations)
+        }
     }
 }

@@ -119,11 +119,11 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-slate-800 text-indigo-400 border border-slate-700 flex items-center justify-center font-bold text-xs">
-                                        {{ substr($req->employee->name, 0, 2) }}
+                                        {{ substr($req->employee?->name ?? 'N/A', 0, 2) }}
                                     </div>
                                     <div>
-                                        <span class="block font-semibold">{{ $req->employee->name }}</span>
-                                        <span class="block text-[10px] text-slate-400 font-mono">{{ $req->employee->employeeDetail?->employee_code ?? '-' }}</span>
+                                        <span class="block font-semibold">{{ $req->employee?->name ?? 'Deleted User' }}</span>
+                                        <span class="block text-[10px] text-slate-400 font-mono">{{ $req->employee?->employeeDetail?->employee_code ?? '-' }}</span>
                                     </div>
                                 </div>
                             </td>
