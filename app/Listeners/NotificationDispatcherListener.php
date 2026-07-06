@@ -53,7 +53,8 @@ class NotificationDispatcherListener
                 $data, 
                 'single', 
                 $managerId, 
-                $employee
+                $employee,
+                '/leave/' . $leaveRequest->id
             );
         }
     }
@@ -85,7 +86,8 @@ class NotificationDispatcherListener
             $data, 
             'single', 
             $leaveRequest->employee_id, 
-            $leaveRequest->approver
+            $leaveRequest->approver,
+            '/leave?tab=history'
         );
     }
 
@@ -122,7 +124,9 @@ class NotificationDispatcherListener
             'leave_request_rejected', 
             $data, 
             'single', 
-            $leaveRequest->employee_id
+            $leaveRequest->employee_id,
+            null,
+            '/leave?tab=history'
         );
     }
 
@@ -152,7 +156,8 @@ class NotificationDispatcherListener
                 $data, 
                 'single', 
                 $managerId, 
-                $employee
+                $employee,
+                '/attendance/corrections/' . $correction->id
             );
         }
     }
@@ -180,7 +185,8 @@ class NotificationDispatcherListener
             $data, 
             'single', 
             $correction->user_id, 
-            $correction->approvedBy
+            $correction->approvedBy,
+            '/attendance/corrections'
         );
     }
 
@@ -200,7 +206,9 @@ class NotificationDispatcherListener
             'employee_welcome', 
             $data, 
             'single', 
-            $user->id
+            $user->id,
+            null,
+            '/profile'
         );
     }
 
@@ -236,7 +244,9 @@ class NotificationDispatcherListener
                 'holiday_published', 
                 $data, 
                 'single', 
-                $userId
+                $userId,
+                null,
+                '/holiday-calendar'
             );
         }
     }
@@ -272,7 +282,9 @@ class NotificationDispatcherListener
                 'holiday_reminder', 
                 $data, 
                 'single', 
-                $userId
+                $userId,
+                null,
+                '/holiday-calendar'
             );
         }
     }
@@ -299,7 +311,9 @@ class NotificationDispatcherListener
                 'payroll_published', 
                 $data, 
                 'single', 
-                $employee->id
+                $employee->id,
+                null,
+                '/my-payslips'
             );
         }
     }
@@ -325,7 +339,9 @@ class NotificationDispatcherListener
             'salary_revised', 
             $data, 
             'single', 
-            $employee->id
+            $employee->id,
+            null,
+            '/my-payslips'
         );
     }
 

@@ -14,7 +14,7 @@ class Notification extends Model
 
     protected $fillable = [
         'uuid', 'title', 'subject', 'message', 'type', 
-        'priority', 'channel', 'status', 'created_by', 'scheduled_at', 'sent_at'
+        'priority', 'channel', 'action_url', 'status', 'created_by', 'scheduled_at', 'sent_at'
     ];
 
     protected $casts = [

@@ -585,6 +585,22 @@
                 <span class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Account</span>
             </div>
 
+            @php
+                $sidebarUnreadCount = \App\Models\NotificationRecipient::where('employee_id', auth()->id())
+                    ->where('status', '!=', 'read')
+                    ->where('status', '!=', 'archived')
+                    ->count();
+            @endphp
+            <a href="/notifications" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/50 transition duration-200 {{ request()->is('notifications*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/10' : '' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+                <span class="text-sm font-medium">Notifications</span>
+                @if($sidebarUnreadCount > 0)
+                    <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-full">{{ $sidebarUnreadCount }}</span>
+                @endif
+            </a>
+
             <a href="/profile" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/50 transition duration-200 {{ request()->is('profile*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/10' : '' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -768,7 +784,7 @@
                 const dateStr = new Date(item.created_at || notif.created_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
 
                 html += `
-                    <div class="p-3 hover:bg-slate-800/40 transition duration-150 flex items-start gap-3 cursor-pointer ${unreadClass}" data-id="${notif.id}">
+                    <div class="p-3 hover:bg-slate-800/40 transition duration-150 flex items-start gap-3 cursor-pointer ${unreadClass}" data-id="${notif.id}" data-url="${notif.action_url || ''}">
                         <span class="w-2 h-2 mt-1.5 rounded-full shrink-0 ${priorityDot}"></span>
                         <div class="flex-grow min-w-0">
                             <div class="flex items-center justify-between gap-2">
@@ -777,6 +793,7 @@
                             </div>
                             <p class="text-xs text-slate-400 mt-0.5 line-clamp-2">${notif.subject}</p>
                         </div>
+                        <svg class="w-4 h-4 mt-1 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </div>
                 `;
             });
@@ -786,13 +803,14 @@
             listContainer.querySelectorAll('[data-id]').forEach(el => {
                 el.addEventListener('click', function () {
                     const id = this.getAttribute('data-id');
-                    markAsRead(id);
+                    const url = this.getAttribute('data-url');
+                    markAsRead(id, url);
                 });
             });
         }
 
-        // Mark single as read
-        function markAsRead(id) {
+        // Mark single as read and redirect
+        function markAsRead(id, url) {
             fetch(`/notifications/${id}/read`, {
                 method: 'POST',
                 headers: {
@@ -804,9 +822,9 @@
             .then(response => response.json())
             .then(res => {
                 if (res.success) {
-                    loadNotifications();
-                    // Redirect to notifications index
-                    window.location.href = '/notifications';
+                    // Redirect to action_url if available, otherwise to notifications
+                    const redirectUrl = url || res.action_url || '/notifications';
+                    window.location.href = redirectUrl;
                 }
             })
             .catch(err => console.error('Error marking as read:', err));

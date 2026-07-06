@@ -30,6 +30,28 @@
         </div>
     </div>
 
+    <!-- Filter Tabs -->
+    <div class="flex items-center gap-2 border-b border-white/10 pb-4">
+        <a href="{{ route('notifications.index', ['filter' => 'all']) }}" 
+           class="px-4 py-2.5 text-xs font-semibold rounded-xl border border-white/5 transition duration-150 {{ $filter === 'all' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/15 border-indigo-500/10' : 'bg-slate-900/50 text-slate-400 hover:text-slate-200' }}">
+            All Notifications
+        </a>
+        <a href="{{ route('notifications.index', ['filter' => 'unread']) }}" 
+           class="px-4 py-2.5 text-xs font-semibold rounded-xl border border-white/5 transition duration-150 flex items-center gap-2 {{ $filter === 'unread' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/15 border-indigo-500/10' : 'bg-slate-900/50 text-slate-400 hover:text-slate-200' }}">
+            Unread
+            @if($unreadCount > 0)
+                <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full {{ $filter === 'unread' ? 'bg-white/20 text-white' : 'bg-rose-500/20 text-rose-400' }}">{{ $unreadCount }}</span>
+            @endif
+        </a>
+        <a href="{{ route('notifications.index', ['filter' => 'read']) }}" 
+           class="px-4 py-2.5 text-xs font-semibold rounded-xl border border-white/5 transition duration-150 flex items-center gap-2 {{ $filter === 'read' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/15 border-indigo-500/10' : 'bg-slate-900/50 text-slate-400 hover:text-slate-200' }}">
+            Read
+            @if($readCount > 0)
+                <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full {{ $filter === 'read' ? 'bg-white/20 text-white' : 'bg-slate-700 text-slate-400' }}">{{ $readCount }}</span>
+            @endif
+        </a>
+    </div>
+
     <!-- Notifications List -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
         @if($recipients->isEmpty())
@@ -39,8 +61,16 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
                 </div>
-                <h3 class="text-base font-bold text-slate-300">Your inbox is clear</h3>
-                <p class="text-sm text-slate-500 mt-1">You don't have any notifications at the moment.</p>
+                @if($filter === 'unread')
+                    <h3 class="text-base font-bold text-slate-300">All caught up!</h3>
+                    <p class="text-sm text-slate-500 mt-1">You have no unread notifications.</p>
+                @elseif($filter === 'read')
+                    <h3 class="text-base font-bold text-slate-300">No read notifications</h3>
+                    <p class="text-sm text-slate-500 mt-1">Notifications you've read will appear here.</p>
+                @else
+                    <h3 class="text-base font-bold text-slate-300">Your inbox is clear</h3>
+                    <p class="text-sm text-slate-500 mt-1">You don't have any notifications at the moment.</p>
+                @endif
             </div>
         @else
             <div class="divide-y divide-slate-800">
@@ -65,7 +95,7 @@
                         </span>
 
                         <!-- Notification details -->
-                        <div class="flex-grow min-w-0">
+                        <div class="flex-grow min-w-0 {{ $notification->action_url ? 'cursor-pointer' : '' }}" @if($notification->action_url) onclick="window.location.href='{{ $notification->action_url }}'" @endif>
                             <div class="flex flex-wrap items-center gap-2">
                                 <h4 class="text-sm font-bold text-slate-200">{{ $notification->title }}</h4>
                                 <span class="px-2 py-0.5 text-[10px] font-semibold tracking-wide rounded-full uppercase border
@@ -91,6 +121,14 @@
 
                         <!-- Action buttons -->
                         <div class="flex items-center gap-2 ml-4 shrink-0">
+                            @if($notification->action_url)
+                                <a href="{{ $notification->action_url }}" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition duration-200 flex items-center gap-1.5 shadow-lg shadow-indigo-500/20" title="Go to details">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                    </svg>
+                                    View
+                                </a>
+                            @endif
                             @if($isUnread)
                                 <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
                                     @csrf

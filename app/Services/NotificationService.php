@@ -17,9 +17,9 @@ class NotificationService extends BaseService
     /**
      * Send a notification from a template key.
      */
-    public function sendFromTemplate(string $templateKey, array $data, $audienceType, $audienceValues = null, User $actor = null)
+    public function sendFromTemplate(string $templateKey, array $data, $audienceType, $audienceValues = null, User $actor = null, string $actionUrl = null)
     {
-        return $this->transaction(function () use ($templateKey, $data, $audienceType, $audienceValues, $actor) {
+        return $this->transaction(function () use ($templateKey, $data, $audienceType, $audienceValues, $actor, $actionUrl) {
             // 1. Fetch template
             $template = NotificationTemplate::where('key', $templateKey)
                 ->where('status', 'active')
@@ -49,6 +49,7 @@ class NotificationService extends BaseService
                 'type' => $this->determineTypeFromKey($templateKey),
                 'priority' => $this->determinePriorityFromKey($templateKey),
                 'channel' => implode(',', $template->channels),
+                'action_url' => $actionUrl,
                 'status' => 'queued',
                 'created_by' => $actor ? $actor->id : null,
                 'scheduled_at' => now(),
@@ -94,6 +95,7 @@ class NotificationService extends BaseService
                 'type' => $payload['type'] ?? 'custom',
                 'priority' => $payload['priority'] ?? 'medium',
                 'channel' => implode(',', $channels),
+                'action_url' => $payload['action_url'] ?? null,
                 'status' => 'queued',
                 'created_by' => $actor ? $actor->id : null,
                 'scheduled_at' => $payload['scheduled_at'] ?? now(),
